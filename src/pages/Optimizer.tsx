@@ -1,16 +1,9 @@
 
 import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
+import CustomCard from '@/components/ui/custom-card';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { Download, PieChart, TrendingUp } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -18,167 +11,303 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { PieChart, BarChart, Settings, Download, Loader, ArrowRight } from 'lucide-react';
+import FormGroup from '@/components/ui/form-group';
+import Section from '@/components/ui/section';
+import { useToast } from '@/hooks/use-toast';
+import { Switch } from '@/components/ui/switch';
 
-const mockStocks = [
-  { id: 1, name: 'Apple Inc (AAPL)', sector: 'Technology' },
-  { id: 2, name: 'Microsoft Corp (MSFT)', sector: 'Technology' },
-  { id: 3, name: 'Amazon.com Inc (AMZN)', sector: 'Consumer Cyclical' },
-  { id: 4, name: 'Tesla Inc (TSLA)', sector: 'Automotive' },
-  { id: 5, name: 'JP Morgan Chase (JPM)', sector: 'Financial' },
-  { id: 6, name: 'Johnson & Johnson (JNJ)', sector: 'Healthcare' },
-  { id: 7, name: 'Procter & Gamble (PG)', sector: 'Consumer Defensive' },
-  { id: 8, name: 'Visa Inc (V)', sector: 'Financial' },
+import {
+  ResponsiveContainer,
+  PieChart as RechartPieChart,
+  Pie,
+  Cell,
+  Legend,
+  BarChart as RechartBarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as RechartsTooltip,
+} from 'recharts';
+
+const pieData = [
+  { name: 'Technology', value: 35, color: '#4ECDC4' },
+  { name: 'Healthcare', value: 20, color: '#FF6B6B' },
+  { name: 'Finance', value: 15, color: '#5BB4FF' },
+  { name: 'Consumer', value: 10, color: '#FFD166' },
+  { name: 'Energy', value: 10, color: '#9775FA' },
+  { name: 'Others', value: 10, color: '#8CCDFF' },
+];
+
+const riskData = [
+  { name: 'Current', volatility: 12, sharpe: 1.8, drawdown: 15 },
+  { name: 'Optimized', volatility: 9, sharpe: 2.3, drawdown: 11 },
+];
+
+const stockSuggestions = [
+  { ticker: 'AAPL', action: 'Increase', current: '5%', target: '8%', reason: 'Strong fundamentals, low volatility' },
+  { ticker: 'MSFT', action: 'Maintain', current: '7%', target: '7%', reason: 'Well positioned in AI revolution' },
+  { ticker: 'GOOGL', action: 'Decrease', current: '6%', target: '4%', reason: 'Regulatory headwinds expected' },
+  { ticker: 'AMZN', action: 'Add', current: '0%', target: '5%', reason: 'Undervalued, strong growth prospects' },
+  { ticker: 'XOM', action: 'Remove', current: '3%', target: '0%', reason: 'High carbon transition risk' },
 ];
 
 const Optimizer = () => {
-  const [riskTolerance, setRiskTolerance] = useState([5]);
-  const [selectedStocks, setSelectedStocks] = useState<string[]>([]);
+  const [riskLevel, setRiskLevel] = useState('moderate');
+  const [isOptimizing, setIsOptimizing] = useState(false);
+  const [isOptimized, setIsOptimized] = useState(false);
+  const [isFullAnalysis, setIsFullAnalysis] = useState(false);
+  const { toast } = useToast();
 
-  const handleAddStock = (stock: string) => {
-    if (!selectedStocks.includes(stock)) {
-      setSelectedStocks([...selectedStocks, stock]);
-    }
+  const handleOptimize = () => {
+    setIsOptimizing(true);
+    // Simulate optimization
+    setTimeout(() => {
+      setIsOptimizing(false);
+      setIsOptimized(true);
+      toast({
+        title: "Portfolio Optimized",
+        description: "Your portfolio has been optimized based on your risk preferences.",
+      });
+    }, 2500);
+  };
+
+  const handleDownload = () => {
+    toast({
+      title: "Report Downloaded",
+      description: "The optimization report has been downloaded to your device.",
+    });
+  };
+
+  const handleToggleChange = (checked: boolean) => {
+    setIsFullAnalysis(checked);
+    toast({
+      title: checked ? "Full Analysis Mode" : "Individual Module Mode",
+      description: checked 
+        ? "Results will be included in the comprehensive analysis" 
+        : "Results will be shown for this module only",
+      duration: 3000,
+    });
   };
 
   return (
-    <AppLayout>
-      <div className="flex flex-col gap-6">
-        <div className="card-glass p-6 rounded-lg">
-          <h1 className="text-2xl font-bold mb-2">Portfolio Optimizer</h1>
-          <p className="text-muted-foreground mb-6">Optimize your portfolio allocation for maximum returns and minimal risk</p>
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-1 space-y-6">
-              <div className="space-y-3">
-                <Label>Risk Tolerance</Label>
-                <div className="flex items-center gap-4">
-                  <span className="text-sm text-muted-foreground">Conservative</span>
-                  <Slider
-                    value={riskTolerance}
-                    onValueChange={setRiskTolerance}
-                    max={10}
-                    step={1}
-                    className="flex-1"
-                  />
-                  <span className="text-sm text-muted-foreground">Aggressive</span>
-                </div>
-                <div className="text-center text-sm font-medium">
-                  {riskTolerance[0]}/10
-                </div>
-              </div>
-              
-              <div className="space-y-3">
-                <Label>Select Assets</Label>
-                <Select onValueChange={handleAddStock}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Add stock to portfolio" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mockStocks.map(stock => (
-                      <SelectItem key={stock.id} value={stock.name}>{stock.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                
-                <div className="bg-secondary p-3 rounded-lg max-h-60 overflow-y-auto">
-                  {selectedStocks.length > 0 ? (
-                    <ul className="space-y-2">
-                      {selectedStocks.map((stock, index) => (
-                        <li key={index} className="flex justify-between items-center bg-navy-700 p-2 rounded">
-                          <span>{stock}</span>
-                          <Button
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => setSelectedStocks(selectedStocks.filter(s => s !== stock))}
-                          >
-                            ✕
-                          </Button>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <div className="text-center text-muted-foreground py-4">
-                      No assets selected
-                    </div>
-                  )}
-                </div>
-              </div>
-              
-              <Button className="w-full" disabled={selectedStocks.length < 2}>
-                Optimize Portfolio
-              </Button>
-            </div>
-            
-            <div className="lg:col-span-2">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <PieChart className="mr-2 h-5 w-5" />
-                      Optimized Allocation
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="h-64 flex items-center justify-center text-muted-foreground">
-                      {selectedStocks.length < 2 ? (
-                        "Select at least 2 assets to optimize"
-                      ) : (
-                        "Pie chart will appear here"
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <TrendingUp className="mr-2 h-5 w-5" />
-                      Performance Metrics
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-navy-700 p-3 rounded-lg">
-                          <div className="text-sm text-muted-foreground">Expected Return</div>
-                          <div className="text-xl font-semibold text-stockup">+12.5%</div>
-                        </div>
-                        <div className="bg-navy-700 p-3 rounded-lg">
-                          <div className="text-sm text-muted-foreground">Volatility</div>
-                          <div className="text-xl font-semibold">18.3%</div>
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="bg-navy-700 p-3 rounded-lg">
-                          <div className="text-sm text-muted-foreground">Sharpe Ratio</div>
-                          <div className="text-xl font-semibold">1.28</div>
-                        </div>
-                        <div className="bg-navy-700 p-3 rounded-lg">
-                          <div className="text-sm text-muted-foreground">Max Drawdown</div>
-                          <div className="text-xl font-semibold text-stockdown">-22.4%</div>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-navy-700 p-3 rounded-lg">
-                        <div className="text-sm text-muted-foreground">VS. NIFTY 50</div>
-                        <div className="text-xl font-semibold text-stockup">+3.8%</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-              
-              <div className="mt-6 flex justify-end">
-                <Button variant="outline">
-                  <Download className="mr-2 h-4 w-4" />
-                  Export Results
-                </Button>
-              </div>
-            </div>
-          </div>
+    <AppLayout title="Portfolio Optimizer" description="Optimize your portfolio based on risk, return, and other factors">
+      <div className="flex justify-end mb-6">
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-muted-foreground">Individual Module</span>
+          <Switch checked={isFullAnalysis} onCheckedChange={handleToggleChange} />
+          <span className="text-sm text-muted-foreground">Full Analysis</span>
         </div>
       </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <CustomCard 
+          title="Optimization Settings" 
+          className="lg:col-span-1"
+        >
+          <div className="space-y-4">
+            <FormGroup 
+              htmlFor="riskLevel" 
+              label="Risk Tolerance" 
+              tooltip="Choose your preferred level of risk"
+            >
+              <Select value={riskLevel} onValueChange={setRiskLevel}>
+                <SelectTrigger id="riskLevel">
+                  <SelectValue placeholder="Select risk level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="conservative">Conservative</SelectItem>
+                  <SelectItem value="moderate">Moderate</SelectItem>
+                  <SelectItem value="aggressive">Aggressive</SelectItem>
+                  <SelectItem value="custom">Custom</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormGroup>
+            
+            <FormGroup 
+              htmlFor="maxPosition" 
+              label="Maximum Position Size" 
+              hint="Maximum percentage for any single position"
+            >
+              <Input id="maxPosition" type="number" placeholder="e.g., 10" defaultValue="10" />
+            </FormGroup>
+            
+            <FormGroup 
+              htmlFor="sectorConstraints" 
+              label="Sector Constraints" 
+              optional={true}
+            >
+              <Select defaultValue="enabled">
+                <SelectTrigger id="sectorConstraints">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="enabled">Enabled</SelectItem>
+                  <SelectItem value="disabled">Disabled</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormGroup>
+            
+            <FormGroup 
+              htmlFor="esgFilter" 
+              label="ESG Filter" 
+              optional={true}
+            >
+              <Select defaultValue="moderate">
+                <SelectTrigger id="esgFilter">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="strict">Strict</SelectItem>
+                  <SelectItem value="moderate">Moderate</SelectItem>
+                  <SelectItem value="none">None</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormGroup>
+            
+            <Button 
+              className="w-full mt-4" 
+              onClick={handleOptimize}
+              disabled={isOptimizing}
+            >
+              {isOptimizing ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Optimizing...
+                </>
+              ) : (
+                <>
+                  <Settings className="mr-2 h-4 w-4" />
+                  Optimize Portfolio
+                </>
+              )}
+            </Button>
+          </div>
+        </CustomCard>
+        
+        <CustomCard 
+          title="Optimal Asset Allocation" 
+          className="lg:col-span-2"
+          headerAction={
+            isOptimized ? (
+              <Button variant="outline" size="sm" onClick={handleDownload}>
+                <Download className="mr-2 h-4 w-4" />
+                Download
+              </Button>
+            ) : null
+          }
+        >
+          {!isOptimized ? (
+            <div className="flex items-center justify-center h-64 text-muted-foreground flex-col">
+              <PieChart className="h-12 w-12 mb-4 text-muted-foreground/50" />
+              <p>Optimize your portfolio to see the recommended asset allocation</p>
+            </div>
+          ) : (
+            <div className="h-80">
+              <ResponsiveContainer width="100%" height="100%">
+                <RechartPieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Legend layout="vertical" verticalAlign="middle" align="right" />
+                </RechartPieChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CustomCard>
+      </div>
+      
+      {isOptimized && (
+        <>
+          <Section 
+            title="Risk and Performance Metrics" 
+            description="Comparison of current vs. optimized portfolio"
+            columns={1}
+          >
+            <CustomCard>
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <RechartBarChart
+                    data={riskData}
+                    margin={{
+                      top: 20,
+                      right: 30,
+                      left: 20,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <RechartsTooltip />
+                    <Legend />
+                    <Bar dataKey="volatility" name="Volatility (%)" fill="#FF6B6B" />
+                    <Bar dataKey="sharpe" name="Sharpe Ratio" fill="#4ECDC4" />
+                    <Bar dataKey="drawdown" name="Max Drawdown (%)" fill="#5BB4FF" />
+                  </RechartBarChart>
+                </ResponsiveContainer>
+              </div>
+            </CustomCard>
+          </Section>
+          
+          <Section 
+            title="AI Recommendations" 
+            description="Specific changes suggested for your portfolio"
+            columns={1}
+          >
+            <CustomCard>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-white/10">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Ticker</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Action</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Current Weight</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Target Weight</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Rationale</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {stockSuggestions.map((stock, idx) => (
+                      <tr key={idx}>
+                        <td className="px-4 py-4 whitespace-nowrap font-medium">{stock.ticker}</td>
+                        <td className="px-4 py-4 whitespace-nowrap">
+                          <div className={`px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1
+                            ${stock.action === 'Increase' ? 'bg-stockup/20 text-stockup' : 
+                              stock.action === 'Decrease' ? 'bg-stockdown/20 text-stockdown' :
+                              stock.action === 'Add' ? 'bg-teal/20 text-teal' :
+                              stock.action === 'Remove' ? 'bg-coral/20 text-coral' :
+                              'bg-amber-500/20 text-amber-500'}`
+                          }>
+                            {stock.action === 'Increase' && <ArrowRight className="h-3 w-3 rotate-45" />}
+                            {stock.action === 'Decrease' && <ArrowRight className="h-3 w-3 -rotate-45" />}
+                            {stock.action}
+                          </div>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap">{stock.current}</td>
+                        <td className="px-4 py-4 whitespace-nowrap">{stock.target}</td>
+                        <td className="px-4 py-4">{stock.reason}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </CustomCard>
+          </Section>
+        </>
+      )}
     </AppLayout>
   );
 };
