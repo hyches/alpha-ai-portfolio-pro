@@ -1,4 +1,3 @@
-
 import React from 'react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
@@ -96,9 +95,9 @@ const Settings = () => {
                         <SelectValue placeholder="Select your investment horizon" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="short">Short Term (< 1 year)</SelectItem>
+                        <SelectItem value="short">Short Term (&lt; 1 year)</SelectItem>
                         <SelectItem value="medium">Medium Term (1-5 years)</SelectItem>
-                        <SelectItem value="long">Long Term (> 5 years)</SelectItem>
+                        <SelectItem value="long">Long Term (&gt; 5 years)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
