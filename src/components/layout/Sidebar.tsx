@@ -1,14 +1,17 @@
 
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { 
-  ChevronLeft, 
-  ChevronRight, 
-  Home, 
-  BarChart2, 
-  TrendingUp, 
+  LayoutDashboard, 
+  Filter, 
+  BookOpen, 
   PieChart, 
-  Newspaper, 
+  TrendingUp, 
+  FileSearch, 
+  FileText, 
   Settings,
+  ChevronLeft, 
+  ChevronRight,
   DollarSign
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -17,22 +20,22 @@ import { cn } from '@/lib/utils';
 interface NavItemProps {
   icon: React.ElementType;
   label: string;
+  path: string;
   active?: boolean;
   collapsed?: boolean;
-  onClick?: () => void;
 }
 
 const NavItem = ({ 
   icon: Icon, 
   label, 
+  path,
   active = false, 
-  collapsed = false,
-  onClick
+  collapsed = false
 }: NavItemProps) => {
   return (
     <Button
       variant="ghost"
-      onClick={onClick}
+      asChild
       className={cn(
         "flex items-center w-full justify-start gap-3 px-3 py-2 my-1 rounded-md transition-colors",
         active 
@@ -40,24 +43,28 @@ const NavItem = ({
           : "hover:bg-navy-700 text-muted-foreground"
       )}
     >
-      <Icon className="h-5 w-5 shrink-0" />
-      {!collapsed && <span>{label}</span>}
+      <Link to={path}>
+        <Icon className="h-5 w-5 shrink-0" />
+        {!collapsed && <span>{label}</span>}
+      </Link>
     </Button>
   );
 };
 
 const navItems = [
-  { icon: Home, label: "Dashboard", path: "/" },
-  { icon: BarChart2, label: "Analytics", path: "/analytics" },
-  { icon: TrendingUp, label: "Stocks", path: "/stocks" },
-  { icon: PieChart, label: "Portfolio", path: "/portfolio" },
-  { icon: Newspaper, label: "News", path: "/news" },
+  { icon: LayoutDashboard, label: "Dashboard", path: "/" },
+  { icon: Filter, label: "Stock Screener", path: "/screener" },
+  { icon: BookOpen, label: "AI Research Reports", path: "/research" },
+  { icon: PieChart, label: "Portfolio Optimizer", path: "/optimizer" },
+  { icon: TrendingUp, label: "F&O Trading Terminal", path: "/trading" },
+  { icon: FileSearch, label: "Policy Opportunity", path: "/policy" },
+  { icon: FileText, label: "Reports", path: "/reports" },
   { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
 const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const location = useLocation();
   
   const toggleSidebar = () => {
     setCollapsed(!collapsed);
@@ -97,9 +104,9 @@ const Sidebar = () => {
             key={item.label}
             icon={item.icon}
             label={item.label}
-            active={activeItem === item.label}
+            path={item.path}
+            active={location.pathname === item.path}
             collapsed={collapsed}
-            onClick={() => setActiveItem(item.label)}
           />
         ))}
       </nav>
