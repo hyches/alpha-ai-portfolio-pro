@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,47 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				stockup: '#22c55e',
+				stockdown: '#ef4444',
+				navy: {
+					DEFAULT: '#0A1929',
+					50: '#F0F7FF', 
+					100: '#E0F0FF',
+					200: '#B8DFFF',
+					300: '#8CCDFF',
+					400: '#5BB4FF',
+					500: '#1A98FF',
+					600: '#0077E6',
+					700: '#005DB3',
+					800: '#004380',
+					900: '#002C54'
+				},
+				teal: {
+					DEFAULT: '#4ECDC4',
+					50: '#EBF9F8',
+					100: '#D7F3F1',
+					200: '#AEE7E3',
+					300: '#86DCD6',
+					400: '#5DD1C8',
+					500: '#34C6BA',
+					600: '#29A095',
+					700: '#1F7A71',
+					800: '#15544E',
+					900: '#0A2E2A'
+				},
+				coral: {
+					DEFAULT: '#FF6B6B',
+					50: '#FFF0F0',
+					100: '#FFE0E0',
+					200: '#FFC2C2',
+					300: '#FFA3A3',
+					400: '#FF8585',
+					500: '#FF6B6B',
+					600: '#FF3D3D',
+					700: '#FF0F0F',
+					800: '#E00000',
+					900: '#B20000'
 				}
 			},
 			borderRadius: {
@@ -84,11 +126,42 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					}
+				},
+				'fade-out': {
+					'0%': {
+						opacity: '1',
+						transform: 'translateY(0)'
+					},
+					'100%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
+					}
+				},
+				'pulse-gentle': {
+					'0%, 100%': {
+						opacity: '1'
+					},
+					'50%': {
+						opacity: '0.7'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'fade-in': 'fade-in 0.3s ease-out',
+				'fade-out': 'fade-out 0.3s ease-out',
+				'pulse-gentle': 'pulse-gentle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'
 			}
 		}
 	},
