@@ -7,6 +7,14 @@ import { Label } from '@/components/ui/label';
 import CustomCard from '@/components/ui/custom-card';
 import FormGroup from '@/components/ui/form-group';
 import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card';
+import {
   Tabs,
   TabsContent,
   TabsList,
@@ -27,7 +35,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { BarChart2, Download, TrendingDown, TrendingUp, PlayCircle, Loader } from 'lucide-react';
+import { 
+  BarChart2, 
+  Download, 
+  TrendingDown, 
+  TrendingUp, 
+  PlayCircle, 
+  Loader 
+} from '@/utils/icons';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 
