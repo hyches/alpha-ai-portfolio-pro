@@ -1,313 +1,304 @@
 
 import React, { useState } from 'react';
 import AppLayout from '@/components/layout/AppLayout';
-import CustomCard from '@/components/ui/custom-card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
+import { Slider } from '@/components/ui/slider';
+import { Switch } from '@/components/ui/switch';
+import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { PieChart, BarChart, Settings, Download, Loader, ArrowRight } from 'lucide-react';
-import FormGroup from '@/components/ui/form-group';
 import Section from '@/components/ui/section';
+import CustomCard from '@/components/ui/custom-card';
+import FormGroup from '@/components/ui/form-group';
+import { Download, FilePdf, FileSpreadsheet, Loader, TrendingUp, PieChart } from '@/utils/icons';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { Switch } from '@/components/ui/switch';
-
-import {
-  ResponsiveContainer,
-  PieChart as RechartPieChart,
-  Pie,
-  Cell,
-  Legend,
-  BarChart as RechartBarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-} from 'recharts';
-
-const pieData = [
-  { name: 'Technology', value: 35, color: '#4ECDC4' },
-  { name: 'Healthcare', value: 20, color: '#FF6B6B' },
-  { name: 'Finance', value: 15, color: '#5BB4FF' },
-  { name: 'Consumer', value: 10, color: '#FFD166' },
-  { name: 'Energy', value: 10, color: '#9775FA' },
-  { name: 'Others', value: 10, color: '#8CCDFF' },
-];
-
-const riskData = [
-  { name: 'Current', volatility: 12, sharpe: 1.8, drawdown: 15 },
-  { name: 'Optimized', volatility: 9, sharpe: 2.3, drawdown: 11 },
-];
-
-const stockSuggestions = [
-  { ticker: 'AAPL', action: 'Increase', current: '5%', target: '8%', reason: 'Strong fundamentals, low volatility' },
-  { ticker: 'MSFT', action: 'Maintain', current: '7%', target: '7%', reason: 'Well positioned in AI revolution' },
-  { ticker: 'GOOGL', action: 'Decrease', current: '6%', target: '4%', reason: 'Regulatory headwinds expected' },
-  { ticker: 'AMZN', action: 'Add', current: '0%', target: '5%', reason: 'Undervalued, strong growth prospects' },
-  { ticker: 'XOM', action: 'Remove', current: '3%', target: '0%', reason: 'High carbon transition risk' },
-];
 
 const Optimizer = () => {
-  const [riskLevel, setRiskLevel] = useState('moderate');
-  const [isOptimizing, setIsOptimizing] = useState(false);
-  const [isOptimized, setIsOptimized] = useState(false);
-  const [isFullAnalysis, setIsFullAnalysis] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDeepOptimize, setIsDeepOptimize] = useState(false);
   const { toast } = useToast();
 
   const handleOptimize = () => {
-    setIsOptimizing(true);
-    // Simulate optimization
+    setIsLoading(true);
+    
+    // Simulating API call
     setTimeout(() => {
-      setIsOptimizing(false);
-      setIsOptimized(true);
+      setIsLoading(false);
       toast({
         title: "Portfolio Optimized",
-        description: "Your portfolio has been optimized based on your risk preferences.",
+        description: isDeepOptimize ? "Deep optimization complete" : "Quick optimization complete",
       });
     }, 2500);
   };
 
-  const handleDownload = () => {
-    toast({
-      title: "Report Downloaded",
-      description: "The optimization report has been downloaded to your device.",
-    });
-  };
-
-  const handleToggleChange = (checked: boolean) => {
-    setIsFullAnalysis(checked);
-    toast({
-      title: checked ? "Full Analysis Mode" : "Individual Module Mode",
-      description: checked 
-        ? "Results will be included in the comprehensive analysis" 
-        : "Results will be shown for this module only",
-      duration: 3000,
-    });
+  const handleDownload = (type: string) => {
+    setIsDownloading(true);
+    
+    // Simulating download
+    setTimeout(() => {
+      setIsDownloading(false);
+      toast({
+        title: `${type} Download Started`,
+        description: `Your ${type} file will be ready shortly.`,
+      });
+    }, 1500);
   };
 
   return (
-    <AppLayout title="Portfolio Optimizer" description="Optimize your portfolio based on risk, return, and other factors">
-      <div className="flex justify-end mb-6">
-        <div className="flex items-center space-x-2">
-          <span className="text-sm text-muted-foreground">Individual Module</span>
-          <Switch checked={isFullAnalysis} onCheckedChange={handleToggleChange} />
-          <span className="text-sm text-muted-foreground">Full Analysis</span>
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <CustomCard 
-          title="Optimization Settings" 
-          className="lg:col-span-1"
-        >
-          <div className="space-y-4">
-            <FormGroup 
-              htmlFor="riskLevel" 
-              label="Risk Tolerance" 
-              tooltip="Choose your preferred level of risk"
-            >
-              <Select value={riskLevel} onValueChange={setRiskLevel}>
-                <SelectTrigger id="riskLevel">
-                  <SelectValue placeholder="Select risk level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="conservative">Conservative</SelectItem>
-                  <SelectItem value="moderate">Moderate</SelectItem>
-                  <SelectItem value="aggressive">Aggressive</SelectItem>
-                  <SelectItem value="custom">Custom</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormGroup>
-            
-            <FormGroup 
-              htmlFor="maxPosition" 
-              label="Maximum Position Size" 
-              hint="Maximum percentage for any single position"
-            >
-              <Input id="maxPosition" type="number" placeholder="e.g., 10" defaultValue="10" />
-            </FormGroup>
-            
-            <FormGroup 
-              htmlFor="sectorConstraints" 
-              label="Sector Constraints" 
-              optional={true}
-            >
-              <Select defaultValue="enabled">
-                <SelectTrigger id="sectorConstraints">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="enabled">Enabled</SelectItem>
-                  <SelectItem value="disabled">Disabled</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormGroup>
-            
-            <FormGroup 
-              htmlFor="esgFilter" 
-              label="ESG Filter" 
-              optional={true}
-            >
-              <Select defaultValue="moderate">
-                <SelectTrigger id="esgFilter">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="strict">Strict</SelectItem>
-                  <SelectItem value="moderate">Moderate</SelectItem>
-                  <SelectItem value="none">None</SelectItem>
-                </SelectContent>
-              </Select>
-            </FormGroup>
-            
-            <Button 
-              className="w-full mt-4" 
-              onClick={handleOptimize}
-              disabled={isOptimizing}
-            >
-              {isOptimizing ? (
-                <>
-                  <Loader className="mr-2 h-4 w-4 animate-spin" />
-                  Optimizing...
-                </>
-              ) : (
-                <>
-                  <Settings className="mr-2 h-4 w-4" />
-                  Optimize Portfolio
-                </>
-              )}
-            </Button>
-          </div>
-        </CustomCard>
-        
-        <CustomCard 
-          title="Optimal Asset Allocation" 
-          className="lg:col-span-2"
-          headerAction={
-            isOptimized ? (
-              <Button variant="outline" size="sm" onClick={handleDownload}>
-                <Download className="mr-2 h-4 w-4" />
-                Download
+    <AppLayout title="Portfolio Optimizer" description="Optimize your portfolio for maximum returns with minimal risk">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-1 space-y-6">
+          <CustomCard title="Optimization Parameters" description="Configure your optimization preferences">
+            <div className="space-y-4">
+              <FormGroup htmlFor="strategy" label="Optimization Strategy">
+                <Select defaultValue="maxSharpe">
+                  <SelectTrigger id="strategy">
+                    <SelectValue placeholder="Select strategy" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="maxSharpe">Maximize Sharpe Ratio</SelectItem>
+                    <SelectItem value="minRisk">Minimize Risk</SelectItem>
+                    <SelectItem value="maxReturn">Maximize Return</SelectItem>
+                    <SelectItem value="efficient">Efficient Frontier</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormGroup>
+              
+              <FormGroup htmlFor="riskTolerance" label="Risk Tolerance">
+                <Slider
+                  id="riskTolerance"
+                  defaultValue={[50]}
+                  max={100}
+                  step={1}
+                  className="py-4"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Conservative</span>
+                  <span>Balanced</span>
+                  <span>Aggressive</span>
+                </div>
+              </FormGroup>
+              
+              <FormGroup htmlFor="optimizationType" label="Optimization Type">
+                <div className="flex items-center justify-between">
+                  <span>Quick Optimize</span>
+                  <Switch 
+                    id="optimizationType"
+                    checked={isDeepOptimize} 
+                    onCheckedChange={setIsDeepOptimize}
+                  />
+                  <span>Deep Optimize</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {isDeepOptimize 
+                    ? "Deep optimization uses advanced algorithms and Monte Carlo simulations (slower but more accurate)" 
+                    : "Quick optimization provides rapid results using simplified models"}
+                </p>
+              </FormGroup>
+              
+              <FormGroup htmlFor="constraints" label="Additional Constraints">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="maxWeight" className="text-sm">Max Weight per Asset</label>
+                    <Input id="maxWeight" type="number" defaultValue={20} className="w-20 h-8" min={1} max={100} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="minWeight" className="text-sm">Min Weight per Asset</label>
+                    <Input id="minWeight" type="number" defaultValue={5} className="w-20 h-8" min={0} max={50} />
+                  </div>
+                </div>
+              </FormGroup>
+              
+              <Button 
+                className="w-full" 
+                disabled={isLoading}
+                onClick={handleOptimize}
+              >
+                {isLoading ? (
+                  <>
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
+                    Optimizing...
+                  </>
+                ) : (
+                  <>
+                    <PieChart className="mr-2 h-4 w-4" />
+                    Optimize Portfolio
+                  </>
+                )}
               </Button>
-            ) : null
-          }
-        >
-          {!isOptimized ? (
-            <div className="flex items-center justify-center h-64 text-muted-foreground flex-col">
-              <PieChart className="h-12 w-12 mb-4 text-muted-foreground/50" />
-              <p>Optimize your portfolio to see the recommended asset allocation</p>
             </div>
-          ) : (
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <RechartPieChart>
-                  <Pie
-                    data={pieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Legend layout="vertical" verticalAlign="middle" align="right" />
-                </RechartPieChart>
-              </ResponsiveContainer>
+          </CustomCard>
+          
+          <CustomCard title="Download Results">
+            <div className="space-y-3">
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                disabled={isDownloading}
+                onClick={() => handleDownload('PDF')}
+              >
+                <FilePdf className="mr-2 h-4 w-4 text-red-500" />
+                Download as PDF
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="w-full justify-start"
+                disabled={isDownloading}
+                onClick={() => handleDownload('Excel')}
+              >
+                <FileSpreadsheet className="mr-2 h-4 w-4 text-green-500" />
+                Export to Excel
+              </Button>
             </div>
-          )}
-        </CustomCard>
-      </div>
-      
-      {isOptimized && (
-        <>
-          <Section 
-            title="Risk and Performance Metrics" 
-            description="Comparison of current vs. optimized portfolio"
-            columns={1}
-          >
-            <CustomCard>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RechartBarChart
-                    data={riskData}
-                    margin={{
-                      top: 20,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <RechartsTooltip />
-                    <Legend />
-                    <Bar dataKey="volatility" name="Volatility (%)" fill="#FF6B6B" />
-                    <Bar dataKey="sharpe" name="Sharpe Ratio" fill="#4ECDC4" />
-                    <Bar dataKey="drawdown" name="Max Drawdown (%)" fill="#5BB4FF" />
-                  </RechartBarChart>
-                </ResponsiveContainer>
+          </CustomCard>
+        </div>
+        
+        <div className="lg:col-span-2 space-y-6">
+          <CustomCard title="AI Portfolio Suggestions" description="Optimization results based on your preferences">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div>
+                <h4 className="text-sm font-medium mb-2">Current Portfolio</h4>
+                <div className="h-40 bg-gray-100 dark:bg-gray-800 rounded-md flex items-center justify-center">
+                  <p className="text-muted-foreground">Current allocation chart</p>
+                </div>
               </div>
-            </CustomCard>
-          </Section>
+              <div>
+                <h4 className="text-sm font-medium mb-2">Optimized Portfolio</h4>
+                <div className="h-40 bg-gray-100 dark:bg-gray-800 rounded-md flex items-center justify-center">
+                  <p className="text-muted-foreground">Optimized allocation chart</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Expected Return</span>
+                <div className="flex items-center">
+                  <Badge variant="success" className="mr-2">+12.5%</Badge>
+                  <span className="text-green-500 text-xs">↑ 2.8%</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Portfolio Risk</span>
+                <div className="flex items-center">
+                  <Badge variant="success" className="mr-2">-15.2%</Badge>
+                  <span className="text-green-500 text-xs">↓ 3.4%</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Sharpe Ratio</span>
+                <div className="flex items-center">
+                  <Badge className="mr-2">1.8</Badge>
+                  <span className="text-green-500 text-xs">↑ 0.3</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Diversification Score</span>
+                <div className="flex items-center">
+                  <Badge variant="info" className="mr-2">85/100</Badge>
+                  <span className="text-green-500 text-xs">↑ 12</span>
+                </div>
+              </div>
+            </div>
+          </CustomCard>
           
           <Section 
-            title="AI Recommendations" 
-            description="Specific changes suggested for your portfolio"
+            title="Recommended Portfolio Changes" 
+            description="Suggested actions to optimize your portfolio"
             columns={1}
           >
-            <CustomCard>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-white/10">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Ticker</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Action</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Current Weight</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Target Weight</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">Rationale</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/10">
-                    {stockSuggestions.map((stock, idx) => (
-                      <tr key={idx}>
-                        <td className="px-4 py-4 whitespace-nowrap font-medium">{stock.ticker}</td>
-                        <td className="px-4 py-4 whitespace-nowrap">
-                          <div className={`px-2 py-1 rounded-full text-xs font-medium inline-flex items-center gap-1
-                            ${stock.action === 'Increase' ? 'bg-stockup/20 text-stockup' : 
-                              stock.action === 'Decrease' ? 'bg-stockdown/20 text-stockdown' :
-                              stock.action === 'Add' ? 'bg-teal/20 text-teal' :
-                              stock.action === 'Remove' ? 'bg-coral/20 text-coral' :
-                              'bg-amber-500/20 text-amber-500'}`
-                          }>
-                            {stock.action === 'Increase' && <ArrowRight className="h-3 w-3 rotate-45" />}
-                            {stock.action === 'Decrease' && <ArrowRight className="h-3 w-3 -rotate-45" />}
-                            {stock.action}
-                          </div>
-                        </td>
-                        <td className="px-4 py-4 whitespace-nowrap">{stock.current}</td>
-                        <td className="px-4 py-4 whitespace-nowrap">{stock.target}</td>
-                        <td className="px-4 py-4">{stock.reason}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div className="space-y-4">
+              <div className="p-4 border rounded-md">
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <h4 className="font-medium">AAPL (Apple Inc.)</h4>
+                    <p className="text-xs text-muted-foreground">Technology</p>
+                  </div>
+                  <Badge variant="success"><TrendingUp className="mr-1 h-3 w-3" /> Increase</Badge>
+                </div>
+                <div className="flex items-center mb-2">
+                  <span className="text-sm text-muted-foreground w-24">Current:</span>
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full">
+                    <div className="h-2 bg-blue-500 rounded-full" style={{ width: '15%' }}></div>
+                  </div>
+                  <span className="text-sm ml-2">15%</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-sm text-muted-foreground w-24">Recommended:</span>
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full">
+                    <div className="h-2 bg-green-500 rounded-full" style={{ width: '20%' }}></div>
+                  </div>
+                  <span className="text-sm ml-2">20%</span>
+                </div>
               </div>
-            </CustomCard>
+              
+              <div className="p-4 border rounded-md">
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <h4 className="font-medium">MSFT (Microsoft Corp.)</h4>
+                    <p className="text-xs text-muted-foreground">Technology</p>
+                  </div>
+                  <Badge variant="destructive"><TrendingUp className="mr-1 h-3 w-3 rotate-180" /> Decrease</Badge>
+                </div>
+                <div className="flex items-center mb-2">
+                  <span className="text-sm text-muted-foreground w-24">Current:</span>
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full">
+                    <div className="h-2 bg-blue-500 rounded-full" style={{ width: '25%' }}></div>
+                  </div>
+                  <span className="text-sm ml-2">25%</span>
+                </div>
+                <div className="flex items-center">
+                  <span className="text-sm text-muted-foreground w-24">Recommended:</span>
+                  <div className="flex-1 h-2 bg-gray-200 rounded-full">
+                    <div className="h-2 bg-red-500 rounded-full" style={{ width: '20%' }}></div>
+                  </div>
+                  <span className="text-sm ml-2">20%</span>
+                </div>
+              </div>
+              
+              <div className="p-4 border rounded-md">
+                <div className="flex justify-between items-center mb-2">
+                  <div>
+                    <h4 className="font-medium">New Recommendation</h4>
+                    <p className="text-xs text-muted-foreground">Add to Portfolio</p>
+                  </div>
+                  <Badge variant="warning">New Addition</Badge>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
+                  <div className="p-3 border rounded-md">
+                    <h5 className="text-sm font-medium">NVDA</h5>
+                    <p className="text-xs text-muted-foreground">Nvidia Corp.</p>
+                    <p className="text-sm font-medium mt-1">Allocation: 5%</p>
+                  </div>
+                  
+                  <div className="p-3 border rounded-md">
+                    <h5 className="text-sm font-medium">GOOGL</h5>
+                    <p className="text-xs text-muted-foreground">Alphabet Inc.</p>
+                    <p className="text-sm font-medium mt-1">Allocation: 7%</p>
+                  </div>
+                  
+                  <div className="p-3 border rounded-md">
+                    <h5 className="text-sm font-medium">AMZN</h5>
+                    <p className="text-xs text-muted-foreground">Amazon.com Inc.</p>
+                    <p className="text-sm font-medium mt-1">Allocation: 8%</p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </Section>
-        </>
-      )}
+        </div>
+      </div>
     </AppLayout>
   );
 };

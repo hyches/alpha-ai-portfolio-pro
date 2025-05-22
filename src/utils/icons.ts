@@ -9,7 +9,13 @@ import {
   TrendingUp, 
   TrendingDown, 
   PlayCircle, 
-  BarChart2
+  BarChart2,
+  Filter,
+  BookOpen,
+  PieChart,
+  FileSearch,
+  Settings,
+  LayoutDashboard
 } from "lucide-react";
 
 // Export all icons
@@ -23,5 +29,11 @@ export {
   TrendingUp,
   TrendingDown,
   PlayCircle,
-  BarChart2
+  BarChart2,
+  Filter,
+  BookOpen,
+  PieChart,
+  FileSearch,
+  Settings,
+  LayoutDashboard
 };
