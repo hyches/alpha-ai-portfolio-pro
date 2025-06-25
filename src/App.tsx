@@ -3,6 +3,9 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import AuthPage from "@/components/auth/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 import Screener from "./pages/Screener";
@@ -18,21 +21,55 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/screener" element={<Screener />} />
-          <Route path="/research" element={<Research />} />
-          <Route path="/optimizer" element={<Optimizer />} />
-          <Route path="/trading" element={<Trading />} />
-          <Route path="/policy" element={<Policy />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <Toaster />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/auth" element={<AuthPage />} />
+            <Route path="/" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/screener" element={
+              <ProtectedRoute>
+                <Screener />
+              </ProtectedRoute>
+            } />
+            <Route path="/research" element={
+              <ProtectedRoute>
+                <Research />
+              </ProtectedRoute>
+            } />
+            <Route path="/optimizer" element={
+              <ProtectedRoute>
+                <Optimizer />
+              </ProtectedRoute>
+            } />
+            <Route path="/trading" element={
+              <ProtectedRoute>
+                <Trading />
+              </ProtectedRoute>
+            } />
+            <Route path="/policy" element={
+              <ProtectedRoute>
+                <Policy />
+              </ProtectedRoute>
+            } />
+            <Route path="/reports" element={
+              <ProtectedRoute>
+                <Reports />
+              </ProtectedRoute>
+            } />
+            <Route path="/settings" element={
+              <ProtectedRoute>
+                <Settings />
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
